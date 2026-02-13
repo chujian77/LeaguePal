@@ -1,13 +1,15 @@
 <template>
-    <div id="app">
-        <h1>💖 Hello Vue!</h1>
-        <p>Welcome to your Electron + Vue application.</p>
+    <div class="connection-status" :class="{ connected: isConnected }">
+        {{ isConnected ? '✅ 已连接' : '❌ 未连接' }} ({{ connectionState }})
     </div>
+    <home />
 </template>
 
 <script setup lang="ts">
-// Vue 组件逻辑写在这里
-console.log('Vue App mounted!');
+import home from './page/Home.vue';
+import { useLcuConnection } from './composables/useLcuConnection';
+
+const { connectionState, isConnected } = useLcuConnection();
 </script>
 
 <style scoped>

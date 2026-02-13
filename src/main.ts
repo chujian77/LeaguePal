@@ -1,26 +1,76 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, Tray, Menu, nativeImage } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import './lcu/bootstrap';
-
+import './ipc';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   app.quit();
 }
 
-const createWindow = async () => {
+let mainWindow: BrowserWindow | null = null;
+let tray: Tray | null = null;
+let isQuitting = false;
 
+const createTray = () => {
+  // 使用实际的 PNG 图标文件
+  const iconPath = path.join(__dirname, 'tray-icon.png');
+  const icon = nativeImage.createFromPath(iconPath);
+
+  tray = new Tray(icon);
+  tray.setToolTip('LeaguePal');
+
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: '显示窗口',
+      click: () => {
+        if (mainWindow) {
+          mainWindow.show();
+          mainWindow.focus();
+        }
+      },
+    },
+    {
+      type: 'separator',
+    },
+    {
+      label: '退出',
+      click: () => {
+        isQuitting = true;
+        app.quit();
+      },
+    },
+  ]);
+
+  tray.setContextMenu(contextMenu);
+
+  // 双击托盘图标显示窗口
+  tray.on('double-click', () => {
+    if (mainWindow) {
+      mainWindow.show();
+      mainWindow.focus();
+    }
+  });
+};
+
+const createWindow = async () => {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 900,
     height: 800,
-    x: 0,
-    y: 0,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       devTools: app.isPackaged ? false : true,
     },
+  });
+
+  // 拦截关闭事件，最小化到托盘而不是退出
+  mainWindow.on('close', (event) => {
+    if (!isQuitting) {
+      event.preventDefault();
+      mainWindow?.hide();
+    }
   });
 
   // and load the index.html of the app.
@@ -33,15 +83,21 @@ const createWindow = async () => {
   }
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
-
-  // mainWindow.hide()
+  // mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+app.on('ready', () => {
+  createTray();
+  createWindow();
+});
+
+// 在 macOS 上，当用户从 Dock 菜单退出时
+app.on('before-quit', () => {
+  isQuitting = true;
+});
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
@@ -57,6 +113,8 @@ app.on('activate', () => {
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
+  } else if (mainWindow) {
+    mainWindow.show();
   }
 });
 

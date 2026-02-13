@@ -1,7 +1,22 @@
 // vite.main.config.ts
 import { defineConfig } from 'vite';
+import { copyFileSync, existsSync } from 'fs';
+import { resolve } from 'path';
 
 export default defineConfig({
+    plugins: [
+        {
+            name: 'copy-tray-icon',
+            closeBundle() {
+                const src = resolve(__dirname, 'src/tray-icon.png');
+                const dest = resolve(__dirname, '.vite/build/tray-icon.png');
+                if (existsSync(src)) {
+                    copyFileSync(src, dest);
+                    console.log('Copied tray-icon.png to .vite/build/');
+                }
+            },
+        },
+    ],
     build: {
         rollupOptions: {
             external: [

@@ -1,9 +1,14 @@
 // LCU 启动引导
 
 import { createLCUManager, LCUEvents, ConnectionState } from './index';
+import { startAceMonitor, stopAceMonitor, preLaunchSGuard64, watchForGameClient } from '../antiCheatExpert';
+
+// 启动游戏客户端监控，检测到客户端启动时立即预启动自定义 SGuard64
+// 这样可以抢在系统默认的 SGuard64 之前启动
+watchForGameClient();
 
 // 创建管理器
-const lcuManager = createLCUManager({
+export const lcuManager = createLCUManager({
     credentialsPollInterval: 3000,  // 等待客户端启动的轮询间隔
     connectionRetryDelay: 2000,     // 连接重试间隔
     healthCheckInterval: 5000,      // 健康检查间隔
@@ -15,22 +20,29 @@ const lcuManager = createLCUManager({
 lcuManager.on('state-change', (newState: ConnectionState, oldState: ConnectionState) => {
     console.log(`状态变化: ${oldState} -> ${newState}`);
 
-    // 可以在这里更新 UI
     switch (newState) {
         case ConnectionState.WAITING_FOR_CLIENT:
             console.log('等待客户端启动...');
+            // 客户端未启动，停止 ACE 监控
+            stopAceMonitor();
             break;
         case ConnectionState.CONNECTING:
             console.log('正在连接...');
+            // 客户端已启动（正在连接），开始 ACE 监控
+            startAceMonitor();
             break;
         case ConnectionState.CONNECTED:
             console.log('已连接！');
+            // 确保 ACE 监控在运行
+            startAceMonitor();
             break;
         case ConnectionState.RECONNECTING:
             console.log('正在重连...');
             break;
         case ConnectionState.DISCONNECTED:
             console.log('已断开');
+            // 客户端断开，停止 ACE 监控
+            stopAceMonitor();
             break;
     }
 });
@@ -64,6 +76,8 @@ lcuManager.on('connected', async (connector) => {
 // 监听客户端关闭
 lcuManager.on('client-closed', () => {
     console.log('客户端已关闭，等待重新启动...');
+    // 重新启动游戏客户端监控，为下次启动做准备
+    watchForGameClient();
 });
 
 // 监听等待客户端

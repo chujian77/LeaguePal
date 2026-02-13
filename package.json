@@ -1,8 +1,8 @@
 {
-  "name": "app1",
-  "productName": "app1",
+  "name": "league-pal",
+  "productName": "LeaguePal",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "LeaguePal - 你的英雄联盟客户端助手",
   "main": ".vite/build/main.js",
   "private": true,
   "scripts": {
