@@ -65,7 +65,7 @@ lcuManager.on('connected', async (connector) => {
         setTimeout(() => {
             lcuManager.post('/lol-matchmaking/v1/ready-check/accept')
 
-        }, 2000);
+        }, 4000);
     });
 
     // await lcuManager.subscribe(LCUEvents.CHAMP_SELECT, (data) => {

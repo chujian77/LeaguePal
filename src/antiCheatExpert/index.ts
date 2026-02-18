@@ -3,7 +3,7 @@ import { promisify } from 'node:util';
 import { cpus } from 'node:os';
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
-import { app } from 'electron';
+import { app, powerMonitor } from 'electron';
 
 // TODO 分模块，把共同的utils抽到utils.ts里，ACE相关的功能放在aceMonitor.ts里，bootstrap.ts里只负责启动监控和预启动
 
@@ -21,6 +21,7 @@ const configuredPids = new Set<number>();
 let checkTimer: ReturnType<typeof setInterval> | null = null;
 let cleanupTimer: ReturnType<typeof setInterval> | null = null;
 let isMonitoring = false;
+let resumeHandler: (() => void) | null = null;
 
 // ACE 自定义路径配置
 const configDir = join(app.getPath('userData'), 'config');
@@ -340,6 +341,14 @@ export function startAceMonitor(): void {
         cleanupStalePids();
     }, 30000);
 
+    // 监听系统唤醒事件，休眠恢复后重新配置 ACE 进程
+    resumeHandler = () => {
+        console.log('[ACE Monitor] 检测到系统从休眠/睡眠中恢复，清空已配置记录，重新检查');
+        configuredPids.clear();
+        checkAndConfigure();
+    };
+    powerMonitor.on('resume', resumeHandler);
+
     const numCPUs = cpus().length;
     console.log(
         `[ACE Monitor] 反作弊进程监控已启动\n` +
@@ -365,6 +374,11 @@ export function stopAceMonitor(): void {
     if (cleanupTimer) {
         clearInterval(cleanupTimer);
         cleanupTimer = null;
+    }
+
+    if (resumeHandler) {
+        powerMonitor.removeListener('resume', resumeHandler);
+        resumeHandler = null;
     }
 
     configuredPids.clear();
