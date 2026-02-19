@@ -266,7 +266,7 @@ export class LCUManager extends EventEmitter {
 
                 return;
             } catch (error) {
-                console.error(`[LCU Manager] WebSocket 连接尝试 ${attempt} 失败:`, error);
+                // console.error(`[LCU Manager] WebSocket 连接尝试 ${attempt} 失败:`, error);
                 console.warn(`[LCU Manager] WebSocket 连接尝试 ${attempt}/${maxAttempts} 失败`);
 
                 if (attempt < maxAttempts) {
