@@ -49,10 +49,10 @@
 npm install
 
 # 启动开发模式（需要 gsudo 以获取管理员权限）
-npm start
+npm run dev
 
 # 打包
-npm run make
+npm run build
 ```
 
 > **注意**：程序需要以**管理员权限**运行，用于设置 ACE 进程的优先级和 CPU 亲和性。
