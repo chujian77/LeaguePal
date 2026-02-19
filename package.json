@@ -1,7 +1,7 @@
 {
   "name": "league-pal",
   "productName": "LeaguePal",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "LeaguePal - 你的英雄联盟客户端助手",
   "main": ".vite/build/main.js",
   "private": true,
