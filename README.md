@@ -68,3 +68,7 @@ npm run build
 ## License
 
 [MIT](LICENSE)
+
+## 💡 致谢 (Acknowledgments)
+
+本项目的主要代码逻辑由 [Anthropic Claude](https://www.anthropic.com/claude) 协助编写 / 生成。感谢 AI 提供的强大生产力支持！
