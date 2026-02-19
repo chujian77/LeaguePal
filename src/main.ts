@@ -87,12 +87,20 @@ const createWindow = async () => {
     }
   });
 
-  // and load the index.html of the app.
-  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+  // 使用 Electron 原生的 app.isPackaged 来判断环境
+  if (!app.isPackaged) {
+    // 开发环境：直接加载 Vite 的本地开发服务器
+    // (Vite 默认运行在 5173 端口，如果你的端口不同，请修改这里)
+    mainWindow.loadURL('http://localhost:5173');
+
+    // 开发环境下自动打开开发者工具 (可选)
+    // mainWindow.webContents.openDevTools();
   } else {
+    // 生产环境：加载编译打包后的静态 HTML 文件
+    // 因为主进程代码编译后会放在 .vite/build/ 目录下，
+    // 所以我们需要回退一层 `../` 找到 renderer 目录
     mainWindow.loadFile(
-      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
+      path.join(__dirname, '../renderer/main_window/index.html')
     );
   }
 

@@ -1,7 +1,11 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 
-// https://vitejs.dev/config
 export default defineConfig({
-    plugins: [vue()],
+    plugins: [vue()], // 你原有的 vue 插件保持不变
+    base: './',       // ⚠️ 关键：让打包后的资源路径变成相对路径
+    build: {
+        outDir: '.vite/renderer/main_window',
+        emptyOutDir: true,
+    },
 });

@@ -2,6 +2,7 @@
 import { defineConfig } from 'vite';
 import { copyFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
+import { builtinModules } from 'module';
 
 export default defineConfig({
     plugins: [
@@ -18,20 +19,28 @@ export default defineConfig({
         },
     ],
     build: {
+        outDir: '.vite/build',
+        emptyOutDir: true,
+        lib: {
+            entry: 'src/main.ts',
+            formats: ['cjs'],
+            fileName: () => 'main.js',
+        },
         rollupOptions: {
+            // ws 内部有 WebSocket.WebSocket = WebSocket 的循环引用。
+            // 若让 Rollup 打包内联 ws，会破坏该循环引用，导致
+            // "WebSocket is not a constructor" 错误。
+            // 将 ws 标记为 external，由 electron-builder 将 node_modules/ws 打包进应用。
+            // bufferutil / utf-8-validate 是 ws 的可选原生依赖，同样不打包进 bundle，
+            // ws 会在运行时自动降级到纯 JS 实现。
             external: [
-                // 将 ws 的可选依赖标记为外部模块
+                'ws',
                 'bufferutil',
                 'utf-8-validate',
+                'electron',
+                ...builtinModules,
+                ...builtinModules.map(m => `node:${m}`)
             ],
-        },
-    },
-    // 或者使用 resolve.alias 将这些模块解析为空
-    resolve: {
-        alias: {
-            // 如果 external 不生效，可以尝试这个
-            // 'bufferutil': './src/empty-module.ts',
-            // 'utf-8-validate': './src/empty-module.ts',
         },
     },
 });

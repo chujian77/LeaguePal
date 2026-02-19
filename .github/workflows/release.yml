@@ -4,7 +4,7 @@ on:
   push:
     tags:
       - 'v*' # 只有推送 v 开头的 tag 时触发
-      
+
   workflow_dispatch: # 🌟 新增这一行！允许你在 GitHub 网页上手动点击按钮打包
 jobs:
   release:
@@ -28,4 +28,4 @@ jobs:
       - name: Publish Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run publish
+        run: npm run release
