@@ -8,6 +8,19 @@ import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { FuseV1Options, FuseVersion } from '@electron/fuses';
 
 const config: ForgeConfig = {
+  publishers: [
+    {
+      name: '@electron-forge/publisher-github',
+      config: {
+        repository: {
+          owner: 'chujian77', // 你的 GitHub 用户名
+          name: 'LeaguePal'   // 你的仓库名
+        },
+        prerelease: false,
+        draft: true // 建议先设为 true。这样 Actions 打包完会生成一个“草稿”Release，你确认没问题后再手动点发布。如果你想完全自动化，设为 false。
+      }
+    }
+  ],
   packagerConfig: {
     asar: true,
     win32metadata: {
@@ -17,9 +30,9 @@ const config: ForgeConfig = {
   rebuildConfig: {},
   makers: [
     new MakerSquirrel({}),
-    new MakerZIP({}, ['darwin']),
-    new MakerRpm({}),
-    new MakerDeb({}),
+    // new MakerZIP({}, ['darwin']),
+    // new MakerRpm({}),
+    // new MakerDeb({}),
   ],
   plugins: [
     new VitePlugin({
