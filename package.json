@@ -29,7 +29,8 @@
       "requestedExecutionLevel": "requireAdministrator",
       "target": [
         "nsis"
-      ]
+      ],
+      "icon": ".vite/build/icon.png"
     },
     "nsis": {
       "oneClick": false,

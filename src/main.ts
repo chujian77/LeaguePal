@@ -29,7 +29,7 @@ let isQuitting = false;
 
 const createTray = () => {
   // 使用实际的 PNG 图标文件
-  const iconPath = path.join(__dirname, 'tray-icon.png');
+  const iconPath = path.join(__dirname, 'icon.png');
   const icon = nativeImage.createFromPath(iconPath);
 
   tray = new Tray(icon);
@@ -77,6 +77,7 @@ const createWindow = async () => {
       preload: path.join(__dirname, 'preload.js'),
       devTools: app.isPackaged ? false : true,
     },
+    icon: path.join(__dirname, 'icon.png')
   });
 
   // 拦截关闭事件，最小化到托盘而不是退出

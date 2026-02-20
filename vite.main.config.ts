@@ -9,11 +9,11 @@ export default defineConfig({
         {
             name: 'copy-tray-icon',
             closeBundle() {
-                const src = resolve(__dirname, 'src/tray-icon.png');
-                const dest = resolve(__dirname, '.vite/build/tray-icon.png');
+                const src = resolve(__dirname, 'src/icon.png');
+                const dest = resolve(__dirname, '.vite/build/icon.png');
                 if (existsSync(src)) {
                     copyFileSync(src, dest);
-                    console.log('Copied tray-icon.png to .vite/build/');
+                    console.log('Copied icon.png to .vite/build/');
                 }
             },
         },
